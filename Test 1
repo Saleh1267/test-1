@@ -84,3 +84,4 @@ while game_running:
 
 # Quit Pygame
 pygame.quit()
+pip install pyinstaller

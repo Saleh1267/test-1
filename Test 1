@@ -1,0 +1,86 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Set the screen size
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+# Set the game title
+pygame.display.set_caption("Avoid the Obstacles")
+
+# Set the clock for the game
+clock = pygame.time.Clock()
+
+# Load the images
+player_img = pygame.image.load('player.png').convert_alpha()
+obstacle_img = pygame.image.load('obstacle.png').convert_alpha()
+
+# Set the game variables
+player_x = 400
+player_y = 500
+player_speed = 5
+player_rect = player_img.get_rect(center=(player_x, player_y))
+
+obstacle_x = random.randint(0, screen_width - obstacle_img.get_width())
+obstacle_y = -obstacle_img.get_height()
+obstacle_speed = 5
+obstacle_rect = obstacle_img.get_rect(center=(obstacle_x, obstacle_y))
+
+score = 0
+
+# Define the functions
+def update_obstacle():
+    global obstacle_x, obstacle_y, obstacle_rect
+    obstacle_y += obstacle_speed
+    obstacle_rect = obstacle_img.get_rect(center=(obstacle_x, obstacle_y))
+    if obstacle_y > screen_height:
+        obstacle_x = random.randint(0, screen_width - obstacle_img.get_width())
+        obstacle_y = -obstacle_img.get_height()
+
+def draw_text(text, font_size, x, y):
+    font = pygame.font.SysFont(None, font_size)
+    text_surface = font.render(text, True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(x, y))
+    screen.blit(text_surface, text_rect)
+
+# Game loop
+game_running = True
+while game_running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_running = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= player_speed
+    if keys[pygame.K_RIGHT] and player_x < screen_width - player_img.get_width():
+        player_x += player_speed
+
+    update_obstacle()
+
+    if player_rect.colliderect(obstacle_rect):
+        game_running = False
+
+    # Clear the screen
+    screen.fill((0, 0, 0))
+
+    # Draw the player and obstacles
+    screen.blit(player_img, (player_x, player_y))
+    screen.blit(obstacle_img, (obstacle_x, obstacle_y))
+
+    # Draw the score
+    score += 1
+    draw_text(str(score), 30, screen_width // 2, 50)
+
+    # Update the display
+    pygame.display.update()
+
+    # Set the FPS
+    clock.tick(60)
+
+# Quit Pygame
+pygame.quit()
